@@ -4,3 +4,4 @@ matplotlib
 Cython
 pytest
 numba
+pycuda
