@@ -124,16 +124,12 @@ def init_gpu():
     global DTW_GPU_Initialized
     if not DTW_GPU_Initialized:
         try:
-            import pycuda.driver as cuda
+            import pycuda.autoinit
             from pycuda.compiler import SourceModule
-            cuda.init()
-            device = cuda.Device(0)  # enter your gpu id here
-            ctx = device.make_context()
             mod = SourceModule(s)
             global DTW_Step_
             DTW_Step_ = mod.get_function("DTW_Diag_Step")
             DTW_GPU_Initialized = True
-            ctx.pop()
         except Exception as e:
             global DTW_GPU_Failed
             DTW_GPU_Failed = True
