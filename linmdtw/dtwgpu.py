@@ -10,7 +10,7 @@ import warnings
 DTW_Step_ = None
 DTW_GPU_Initialized = False
 DTW_GPU_Failed = False
-ctx = None
+
 def init_gpu():
     s = """
     __global__ void DTW_Diag_Step(float* d0, float* d1, float* d2, float* csm0, float* csm1, float* csm2, float* X, float* Y, int dim, int diagLen, int* box, int reverse, int i, int debug, float* U, float* L, float* UL, float* S) {
@@ -124,12 +124,8 @@ def init_gpu():
     global DTW_GPU_Initialized
     if not DTW_GPU_Initialized:
         try:
-            import pycuda.driver as cuda
+            import pycuda.autoinit
             from pycuda.compiler import SourceModule
-            cuda.init()
-            device = cuda.Device(0)  # enter your Gpu id here
-            global ctx
-            ctx = device.make_context()
             mod = SourceModule(s)
             global DTW_Step_
             DTW_Step_ = mod.get_function("DTW_Diag_Step")
@@ -240,6 +236,4 @@ def dtw_diag_gpu(X, Y, k_save = -1, k_stop = -1, box = None, reverse=False, debu
         res['L'] = L.get()
         res['UL'] = UL.get()
         res['S'] = S.get()
-    global ctx
-    ctx.pop()
     return res
